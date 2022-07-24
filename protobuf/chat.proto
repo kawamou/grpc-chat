@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "../server/pb";
+
+package chat.v1;
+
+service ChatService {
+    rpc GetMessageStream (google.protobuf.Empty) returns (stream GetMessageStreamResponse);
+    rpc CreateMessage (CreateMessageRequest) returns (CreateMessageResponse);
+}
+
+message Message {
+    string name = 1;
+    string message = 2;
+    google.protobuf.Timestamp created_at = 3;
+}
+
+message GetMessageStreamResponse {
+    Message message = 1;
+}
+
+message CreateMessageRequest {
+   Message message = 1;
+}
+
+message CreateMessageResponse {
+    string result = 1;
+}

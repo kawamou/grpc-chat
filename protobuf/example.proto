@@ -1,0 +1,25 @@
+// https://zenn.dev/hsaki/books/golang-grpc-starting/viewer/proto
+// protoのバージョンの宣言
+syntax = "proto3";
+
+// protoファイルから自動生成させるGoのコードの置き先
+// (詳細は4章にて)
+option go_package = "pkg/grpc";
+
+// packageの宣言
+package myapp;
+
+// サービスの定義
+service GreetingService {
+	// サービスが持つメソッドの定義
+	rpc Hello (HelloRequest) returns (HelloResponse); 
+}
+
+// 型の定義
+message HelloRequest {
+	string name = 1;
+}
+
+message HelloResponse {
+	string message = 1;
+}

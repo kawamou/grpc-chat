@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+    db:
+      build:
+        context: .
+        dockerfile: ./Dockerfile.firestore
+      ports:
+        - 8000:8000
+      volumes:
+        # - .cache/firebase/emulators/:/app/.cache/firebase/emulators/
+        - .:/app
+    server:
+      build:
+        context: .
+        target: dev
+        dockerfile: ./server/Dockerfile
+      tty: true
+      expose:
+          - 8080
+      ports:
+        - 8080:8080
+      environment:
+        PROJECT_ID: foo
+        FIRESTORE_EMULATOR_HOST: host.docker.internal:8000
+      command: ["air"]
+      volumes:
+        - ./server:/go/src/app

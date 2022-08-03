@@ -43,9 +43,9 @@ func (s *Server) GetMessageStream(req *emptypb.Empty, server pb.ChatService_GetM
 		createdAt := timestamppb.New(v.CreatedAt)
 		if err := server.Send(&pb.GetMessageStreamResponse{
 			Message: &pb.Message{
-				Name:      v.Name,
-				Message:   v.Message,
-				CreatedAt: createdAt,
+				From:           v.Name,
+				MessageContent: v.Message,
+				CreatedAt:      createdAt,
 			},
 		}); err != nil {
 			return err

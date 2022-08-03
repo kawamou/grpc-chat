@@ -53,6 +53,7 @@ func (m *MessageRepositoryImpl) Listen(ctx context.Context, stream chan<- domain
 					return fmt.Errorf("failed to MessageRepositoryImpl.Listen: %s", err)
 				}
 			}
+			message.Id = diff.Doc.Ref.ID
 
 			select {
 			case <-ctx.Done():

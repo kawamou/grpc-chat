@@ -13,8 +13,8 @@ service ChatService {
 }
 
 message Message {
-    string name = 1;
-    string message = 2;
+    string from = 1;
+    string message_content = 2;
     google.protobuf.Timestamp created_at = 3;
 }
 

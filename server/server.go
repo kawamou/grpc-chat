@@ -43,8 +43,8 @@ func (s *Server) GetMessageStream(req *emptypb.Empty, server pb.ChatService_GetM
 		createdAt := timestamppb.New(v.CreatedAt)
 		if err := server.Send(&pb.GetMessageStreamResponse{
 			Message: &pb.Message{
-				From:           v.Name,
-				MessageContent: v.Message,
+				From:           v.From,
+				MessageContent: v.MessageContent,
 				CreatedAt:      createdAt,
 			},
 		}); err != nil {
@@ -54,7 +54,7 @@ func (s *Server) GetMessageStream(req *emptypb.Empty, server pb.ChatService_GetM
 }
 
 func (s *Server) CreateMessage(ctx context.Context, req *pb.CreateMessageRequest) (*pb.CreateMessageResponse, error) {
-	input := usecase.NewCreateMessageServiceInput(req.Message.Name, req.Message.Message, req.Message.CreatedAt.AsTime())
+	input := usecase.NewCreateMessageServiceInput(req.Message.From, req.Message.MessageContent, req.Message.CreatedAt.AsTime())
 	if err := s.CreateMessageService.Handle(ctx, input); err != nil {
 		return &pb.CreateMessageResponse{
 			Result: err.Error(),

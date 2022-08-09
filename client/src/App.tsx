@@ -6,7 +6,9 @@ import { ChatServiceClient } from "./pb/protobuf/ChatServiceClientPb";
 import { CreateMessageRequest, Message } from "./pb/protobuf/chat_pb";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 
-const useMessagges = (client: ChatServiceClient) => {
+const useMessagges = (
+  client: ChatServiceClient
+): [Message[], (newMessage: Message) => void] => {
   const [messages, setMessages] = useState<Message[]>();
 
   useEffect(() => {
@@ -19,6 +21,7 @@ const useMessagges = (client: ChatServiceClient) => {
       setMessages((current) => {
         return [...(current ?? []), newMessage];
       });
+      console.log(messages);
     });
   }, [client]);
 
@@ -32,6 +35,7 @@ const useMessagges = (client: ChatServiceClient) => {
     },
     [client]
   );
+  return [messages ?? [], addMessage];
 };
 
 const ChatHeader = () => {
@@ -63,7 +67,28 @@ const ChatMessage = ({ from, content }: ChatMessageProps) => {
   );
 };
 
-const ChatHooter = () => {
+type ChatHooterProps = {
+  addMessage: (newMessage: Message) => void;
+};
+
+const ChatHooter = ({ addMessage }: ChatHooterProps) => {
+  const [text, setText] = useState("");
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+  };
+
+  const handleOnSubmit = () => {
+    if (!text) return;
+    const message = new Message();
+    message.setFrom("me");
+    message.setMessageContent(text);
+    message.setCreatedAt();
+    addMessage(message);
+    console.log(message);
+    setText("");
+  };
+
   return (
     <div className="flex items-center justify-between w-full p-3 border-t border-gray-300">
       <input
@@ -72,16 +97,27 @@ const ChatHooter = () => {
         className="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700"
         name="message"
         required
+        onChange={(e) => {
+          handleOnChange(e);
+        }}
       />
-      <button>
+      <button
+        onClick={(e) => {
+          handleOnSubmit();
+        }}
+      >
         <ArrowCircleUpIcon className="w-6 h-6 text-gray-500" />
       </button>
     </div>
   );
 };
 
+const client = new ChatServiceClient("http://localhost:9090");
+
 // ref. https://larainfo.com/blogs/tailwind-css-chat-ui-example
 const App = () => {
+  const [messages, addMessage] = useMessagges(client);
+
   return (
     <div className="App">
       <div className="container mx-auto max-w-3xl">
@@ -102,7 +138,7 @@ const App = () => {
                 />
               </ul>
             </div>
-            <ChatHooter />
+            <ChatHooter addMessage={addMessage} />
           </div>
         </div>
       </div>

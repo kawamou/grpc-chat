@@ -5,6 +5,7 @@ import { ArrowCircleUpIcon } from "@heroicons/react/outline";
 import { ChatServiceClient } from "./pb/protobuf/ChatServiceClientPb";
 import { CreateMessageRequest, Message } from "./pb/protobuf/chat_pb";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
+import { v4 as uuidv4 } from "uuid";
 
 const useMessagges = (
   client: ChatServiceClient
@@ -21,7 +22,6 @@ const useMessagges = (
       setMessages((current) => {
         return [...(current ?? []), newMessage];
       });
-      console.log(messages);
     });
   }, [client]);
 
@@ -38,24 +38,32 @@ const useMessagges = (
   return [messages ?? [], addMessage];
 };
 
-const ChatHeader = () => {
+type ChatHeaderProps = {
+  me: string;
+};
+
+const ChatHeader = ({ me }: ChatHeaderProps) => {
   return (
     <div className="relative flex items-center p-3 border-b border-gray-300">
       <UserIcon className="object-cover w-5 h-5 rounded-full text-gray-600" />
-      <span className="block ml-4 font-bold text-gray-600">anonymous</span>
+      <span className="block ml-4 font-bold text-gray-600">{me}</span>
       <span className="absolute w-2 h-2 bg-green-600 rounded-full left-7 top-3"></span>
     </div>
   );
 };
 
 type ChatMessageProps = {
+  key: number;
   from: "me" | "partner";
   content: string;
 };
 
-const ChatMessage = ({ from, content }: ChatMessageProps) => {
+const ChatMessage = ({ key, from, content }: ChatMessageProps) => {
   return (
-    <li className={`flex ${from === "me" ? "justify-end" : "justify-start"}`}>
+    <li
+      key={key}
+      className={`flex ${from === "me" ? "justify-end" : "justify-start"}`}
+    >
       <div
         className={`relative max-w-xl px-4 py-2 ${
           from === "me" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"
@@ -67,12 +75,14 @@ const ChatMessage = ({ from, content }: ChatMessageProps) => {
   );
 };
 
-type ChatHooterProps = {
-  addMessage: (newMessage: Message) => void;
+type ChatFormProps = {
+  me: string;
+  onSubmit: (newMessage: Message) => void;
 };
 
-const ChatHooter = ({ addMessage }: ChatHooterProps) => {
-  const [text, setText] = useState("");
+// https://konstantinlebedev.com/solid-in-react/
+const ChatForm = ({ me, onSubmit }: ChatFormProps) => {
+  const [text, setText] = useState(uuidv4());
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
@@ -81,10 +91,10 @@ const ChatHooter = ({ addMessage }: ChatHooterProps) => {
   const handleOnSubmit = () => {
     if (!text) return;
     const message = new Message();
-    message.setFrom("me");
+    message.setFrom(me);
     message.setMessageContent(text);
     message.setCreatedAt();
-    addMessage(message);
+    onSubmit(message);
     console.log(message);
     setText("");
   };
@@ -117,28 +127,28 @@ const client = new ChatServiceClient("http://localhost:9090");
 // ref. https://larainfo.com/blogs/tailwind-css-chat-ui-example
 const App = () => {
   const [messages, addMessage] = useMessagges(client);
+  const [userID] = useState(uuidv4());
 
   return (
     <div className="App">
       <div className="container mx-auto max-w-3xl">
         <div className="w-full border rounded">
           <div className="w-full">
-            <ChatHeader />
+            <ChatHeader me={userID} />
             <div className="relative w-full p-6 overflow-y-auto h-[40rem]">
               <ul className="space-y-2">
-                <ChatMessage from="me" content="Hi" />
-                <ChatMessage from="me" content="Hiiii" />
-                <ChatMessage
-                  from="me"
-                  content="how are you?how are you?how are you?how are you?how are you?"
-                />
-                <ChatMessage
-                  from="partner"
-                  content="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Lorem ipsum dolor sit, amet consectetur adipisicing elit."
-                />
+                {messages?.map((message, index) => {
+                  return (
+                    <ChatMessage
+                      key={index}
+                      from={message.getFrom() === userID ? "me" : "partner"}
+                      content={message.getMessageContent()}
+                    />
+                  );
+                })}
               </ul>
             </div>
-            <ChatHooter addMessage={addMessage} />
+            <ChatForm me={userID} onSubmit={addMessage} />
           </div>
         </div>
       </div>

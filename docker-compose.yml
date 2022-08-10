@@ -13,6 +13,7 @@ services:
         dockerfile: ./Dockerfile.firestore
       ports:
         - 8000:8000
+        - 4000:4000
       volumes:
         # - .cache/firebase/emulators/:/app/.cache/firebase/emulators/
         - .:/app

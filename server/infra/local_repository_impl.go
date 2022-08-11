@@ -3,6 +3,7 @@ package infra
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/kawamou/grpcchat/domain"
 )
@@ -17,6 +18,7 @@ func NewLocalMessageRepositoryImpl() *LocalMessageRepositoryImpl {
 
 // Add ...
 func (m *LocalMessageRepositoryImpl) Add(ctx context.Context, message *domain.Message) error {
+	message.CreatedAt = time.Now()
 	localMessages = append(localMessages, *message)
 	return nil
 }

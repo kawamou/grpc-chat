@@ -92,11 +92,12 @@ const ChatForm = ({ me, onSubmit }: ChatFormProps) => {
   );
 };
 
-const client = new ChatServiceClient("http://localhost:9090");
-
 // ref. https://larainfo.com/blogs/tailwind-css-chat-ui-example
 const App = () => {
-  const [messages, addMessage] = useMessagges(client);
+  const [client] = useState<Client>({
+    client: new ChatServiceClient("http://localhost:9090"),
+  });
+  const [messages, addMessage] = useMessages(client);
   const [userID] = useState(uuidv4());
 
   return (

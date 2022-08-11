@@ -81,6 +81,12 @@ const ChatForm = ({ me, onSubmit }: ChatFormProps) => {
           e.preventDefault();
           handleOnChange(e);
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && e.shiftKey) {
+            e.preventDefault();
+            handleOnSubmit();
+          }
+        }}
       />
       <button
         onClick={(e) => {

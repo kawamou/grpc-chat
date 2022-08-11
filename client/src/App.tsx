@@ -52,7 +52,7 @@ type ChatFormProps = {
 
 // https://konstantinlebedev.com/solid-in-react/
 const ChatForm = ({ me, onSubmit }: ChatFormProps) => {
-  const [text, setText] = useState(uuidv4());
+  const [text, setText] = useState("");
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
@@ -65,7 +65,6 @@ const ChatForm = ({ me, onSubmit }: ChatFormProps) => {
     message.setMessageContent(text);
     message.setCreatedAt();
     onSubmit(message);
-    console.log(message);
     setText("");
   };
 
@@ -76,13 +75,16 @@ const ChatForm = ({ me, onSubmit }: ChatFormProps) => {
         placeholder="Message"
         className="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700"
         name="message"
+        value={text}
         required
         onChange={(e) => {
+          e.preventDefault();
           handleOnChange(e);
         }}
       />
       <button
         onClick={(e) => {
+          e.preventDefault();
           handleOnSubmit();
         }}
       >

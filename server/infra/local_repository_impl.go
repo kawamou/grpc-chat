@@ -25,7 +25,12 @@ func (m *LocalMessageRepositoryImpl) Add(ctx context.Context, message *domain.Me
 
 // Listen ...
 func (m *LocalMessageRepositoryImpl) Listen(ctx context.Context, stream chan<- domain.Message) error {
+	for _, message := range localMessages {
+		stream <- message
+	}
+
 	currentLocalMessagesLen := len(localMessages)
+
 	for {
 		select {
 		case <-ctx.Done():

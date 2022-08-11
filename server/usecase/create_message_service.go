@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/kawamou/grpcchat/domain"
@@ -29,6 +30,7 @@ func NewCreateMessageServiceInput(name, message string, createdAt time.Time) *Cr
 }
 
 func (g *CreateMessageService) Handle(ctx context.Context, input *CreateMessageServiceInput) error {
+	log.Printf("create message: %#v\n", input.message)
 	if err := g.messageRepository.Add(ctx, input.message); err != nil {
 		return fmt.Errorf("failed to CreateMessageService.Handle: %w", err)
 	}

@@ -1,42 +1,12 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import { useState } from "react";
 import { UserIcon } from "@heroicons/react/outline";
 import { ArrowCircleUpIcon } from "@heroicons/react/outline";
 import { ChatServiceClient } from "./pb/protobuf/ChatServiceClientPb";
-import { CreateMessageRequest, Message } from "./pb/protobuf/chat_pb";
-import { Empty } from "google-protobuf/google/protobuf/empty_pb";
+import { Message } from "./pb/protobuf/chat_pb";
 import { v4 as uuidv4 } from "uuid";
-
-const useMessagges = (
-  client: ChatServiceClient
-): [Message[], (newMessage: Message) => void] => {
-  const [messages, setMessages] = useState<Message[]>();
-
-  useEffect(() => {
-    const stream = client.getMessageStream(new Empty());
-    stream.on("data", (m) => {
-      const newMessage = m.getMessage();
-      if (!newMessage) {
-        return;
-      }
-      setMessages((current) => {
-        return [...(current ?? []), newMessage];
-      });
-    });
-  }, [client]);
-
-  const addMessage = useCallback(
-    (newMessage: Message) => {
-      const req = new CreateMessageRequest();
-      req.setMessage(newMessage);
-      client.createMessage(req, null, (res) => {
-        console.log(res);
-      });
-    },
-    [client]
-  );
-  return [messages ?? [], addMessage];
-};
+import { useMessages } from "./hooks/useMessages";
+import { Client } from "./gRPCClient";
 
 type ChatHeaderProps = {
   me: string;

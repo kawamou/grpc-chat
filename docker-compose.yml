@@ -33,3 +33,12 @@ services:
       command: ["air"]
       volumes:
         - ./server:/go/src/app
+    client:
+      build:
+        context: .
+        dockerfile: ./Dockerfile.client
+      expose:
+          - 3000
+      ports:
+        - 3000:3000    
+      command: ["npm", "run", "start"]

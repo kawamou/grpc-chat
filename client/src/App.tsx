@@ -7,6 +7,7 @@ import { Message } from "./pb/protobuf/chat_pb";
 import { v4 as uuidv4 } from "uuid";
 import { useMessages } from "./hooks/useMessages";
 import { Client } from "./gRPCClient";
+import { config } from "./config";
 
 type ChatHeaderProps = {
   me: string;
@@ -102,8 +103,11 @@ const ChatForm = ({ me, onSubmit }: ChatFormProps) => {
 
 // ref. https://larainfo.com/blogs/tailwind-css-chat-ui-example
 const App = () => {
-  const [client] = useState<Client>({
-    client: new ChatServiceClient("http://localhost:9090"),
+  const [client] = useState<Client>(() => {
+    const conf = config();
+    return {
+      client: new ChatServiceClient(conf.envoyHost),
+    };
   });
   const [messages, addMessage] = useMessages(client);
   const [userID] = useState(uuidv4());

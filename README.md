@@ -1,13 +1,6 @@
-## server
-### 実行方法
+# 実行方法
 ```sh
-docker compose up server db
+docker compose up
 ```
-Messageストリームを取得する
-```sh
-grpcurl -plaintext localhost:8080 chat.v1.ChatService.GetMessageStream
-```
-Messageを永続化する
-```sh
-grpcurl -plaintext -d '{"message": {"name": "name", "message": "message", "created_at": "2000-01-01T01:01:01Z"}}' localhost:8080 chat.v1.ChatService.CreateMessage
-```
+# 参考
+https://qiita.com/kawamou/items/49176fa4035d485065c1

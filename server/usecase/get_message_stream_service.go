@@ -20,17 +20,12 @@ func NewGetMessageStreamService(repo domain.MessageRepository) *GetMessageStream
 
 func (g *GetMessageStreamService) Handle(ctx context.Context, stream chan<- domain.Message) error {
 	defer close(stream)
-	eg, childCtx := errgroup.WithContext(ctx)
+	eg, _ := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		select {
-		case <-childCtx.Done():
-			return childCtx.Err()
-		default:
-			if err := g.messageRepository.Listen(ctx, stream); err != nil {
-				return err
-			}
-			return nil
+		if err := g.messageRepository.Listen(ctx, stream); err != nil {
+			return err
 		}
+		return nil
 	})
 	if err := eg.Wait(); err != nil {
 		return fmt.Errorf("failed to GetMessageStreamService.Handle: %s", err)
